@@ -29,8 +29,8 @@ class OpenAQProcessor:
             # Thời gian hiện tại (UTC)
             datetime_last = datetime.now(timezone.utc)
 
-            # Thời gian hiện tại trừ đi 144 giờ
-            datetime_first = datetime_last - timedelta(hours=144)
+            # Thời gian hiện tại trừ đi 150 giờ
+            datetime_first = datetime_last - timedelta(hours=150)
 
             # Định dạng lại chuỗi thời gian nếu cần thiết để phù hợp với API OpenAQ
             # Ví dụ: '2023-10-27T10:00:00Z'
@@ -101,11 +101,7 @@ class OpenAQProcessor:
 
         # Apply log transform ONLY to the specified columns
         transformed_df = df.copy()
-
-        # Apply log1p transform only to the specified columns
         transformed_df[cols_to_transform] = np.log1p(transformed_df[cols_to_transform])
-
-        # Replace the original columns with log-transformed values in the main DataFrame
         df[cols_to_transform] = transformed_df[cols_to_transform]
 
         # Thêm time-based features
