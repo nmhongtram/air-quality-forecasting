@@ -40,7 +40,7 @@ def predict(
         raise HTTPException(status_code=400, detail=f"Unsupported model: {model_name}")
 
     try:
-        processor = OpenAQProcessor(API_KEY="94d98cbdd0c42919e1017aa7c619b0ec47fa75c988e232eafb8e8f8e01c3584e")
+        processor = OpenAQProcessor(API_KEY="API_KEY")
         df_raw = processor.get_data_for_prediction()
         df_processed = processor.preprocess(df_raw)
     except Exception as e:
