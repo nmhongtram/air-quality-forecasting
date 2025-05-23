@@ -6,3 +6,6 @@ torchinfo
 matplotlib
 seaborn
 holidays
+openaq
+fastapi
+uvicorn

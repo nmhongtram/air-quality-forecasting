@@ -3,7 +3,6 @@ import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -29,16 +28,14 @@ class ModelManager:
 
         for epoch in range(num_epochs):
             start_time = time.time()
-            self.model.train()  # Set the model to training mode
+            self.model.train()
             total_train_loss = 0
 
             for inputs, targets in self.train_loader:
-                # Forward pass
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
                 total_train_loss += loss.item()
 
-                # Backward pass and optimization
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
@@ -54,13 +51,14 @@ class ModelManager:
                 break
 
             print(f'Epoch [{epoch + 1}/{num_epochs}], '
-                f'time: {int(time.time() - start_time)}s, '
-                f'loss: {avg_train_loss:.4f}, '
-                f'val_loss: {val_loss:.4f}')
+                  f'time: {int(time.time() - start_time)}s, '
+                  f'loss: {avg_train_loss:.4f}, '
+                  f'val_loss: {val_loss:.4f}')
 
+        # Load lại best model
         self.load_model(save_path)
 
-        # Plot training and validation loss
+        # Plot loss
         plt.figure(figsize=(10, 6))
         plt.plot(train_losses, label='Train Loss')
         plt.plot(val_losses, label='Validation Loss')
@@ -69,9 +67,8 @@ class ModelManager:
         plt.title('Train vs Validation Loss')
         plt.legend()
         plt.grid(True)
-
-        plot_path = os.path.join(save_dir, f'{self.model.__class__.__name__}_loss_plot.png')
-        plt.savefig(plot_path)
+        # plot_path = os.path.join(save_dir, f'{self.model.__class__.__name__}_loss_plot.png')
+        # plt.savefig(plot_path)
         plt.show()
         plt.close()
 

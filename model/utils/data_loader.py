@@ -11,7 +11,7 @@ import holidays
 class TimeSeriesDataLoader:
     def __init__(self, file_path, input_size, label_size, offset, train_size, val_size,
                  date_column=None, target_name=None, features_type="M", batch_size=64,
-                 nan_threshold=0.00):
+                 nan_threshold=0.00, stride=1):
 
         self.input_size = input_size
         self.label_size = label_size
@@ -22,6 +22,7 @@ class TimeSeriesDataLoader:
         self.features_type = features_type
         self.batch_size = batch_size
         self.nan_threshold = nan_threshold
+        self.stride = stride
 
         # Load and preprocess data
         self.df = pd.read_csv(file_path)
@@ -85,9 +86,9 @@ class TimeSeriesDataLoader:
         # Replace the original columns with log-transformed values in the main DataFrame
         self.df[self.cols_to_transform] = transformed_df[self.cols_to_transform]
 
-        # Lưu file data đã được xử lý
-        os.makedirs(os.path.join(data_dir, 'processed'), exist_ok=True)
-        self.df.to_csv(os.path.join(data_dir, 'processed/processed_data.csv'))
+        # # Lưu file data đã được xử lý
+        # os.makedirs(os.path.join(data_dir, 'processed'), exist_ok=True)
+        self.df.to_csv('data/processed/processed_data.csv')
 
         self.X_train, self.y_train = self._create_dataset(0, int(train_size * len(self.valid_sequences)))
         print(f'X_train.shape = {self.X_train.shape}')
@@ -109,7 +110,7 @@ class TimeSeriesDataLoader:
         seq_len = self.input_size + self.offset + self.label_size
         valid_chunks = []
 
-        for i in range(0, total_len - seq_len):
+        for i in range(0, total_len - seq_len, self.stride):
             window = self.df.iloc[i:i + seq_len]
             nan_ratio = window.isna().sum().sum() / (seq_len * len(self.df.columns))
             if nan_ratio <= self.nan_threshold:
