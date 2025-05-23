@@ -1,0 +1,8 @@
+Flask
+numpy
+pandas
+torch
+torchinfo
+matplotlib
+seaborn
+holidays
