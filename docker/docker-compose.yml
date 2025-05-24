@@ -1,0 +1,9 @@
+services:
+  airquality-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: airquality-api:latest
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
