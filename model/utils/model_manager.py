@@ -164,23 +164,23 @@ class ModelManager:
         self.model.load_state_dict(torch.load(load_path))
         print(f'Model loaded from {load_path}')
 
-    def predict(self, input_data):
-        self.model.eval()   # Set the model to evaluation mode
+    # def predict(self, input_data):
+    #     self.model.eval()   # Set the model to evaluation mode
 
-        if isinstance(input_data, DataLoader):
-            # If input_data is a DataLoader, iterate through batches and concatenate predictions
-            predictions = []
-            with torch.no_grad():
-                for inputs, _ in input_data:
-                    outputs = self.model(inputs)
-                    predictions.append(outputs)
-            predictions = torch.cat(predictions, dim=0)
-        else:
-            # Assume input_data is a single input tensor
-            with torch.no_grad():
-                predictions = self.model(input_data.unsqueeze(0))
+    #     if isinstance(input_data, DataLoader):
+    #         # If input_data is a DataLoader, iterate through batches and concatenate predictions
+    #         predictions = []
+    #         with torch.no_grad():
+    #             for inputs, _ in input_data:
+    #                 outputs = self.model(inputs)
+    #                 predictions.append(outputs)
+    #         predictions = torch.cat(predictions, dim=0)
+    #     else:
+    #         # Assume input_data is a single input tensor
+    #         with torch.no_grad():
+    #             predictions = self.model(input_data.unsqueeze(0))
 
-        return predictions
+    #     return predictions
 
     def plot(self, y, yhat, feature_names=None, save_dir='.', save_plots=True, num_elements=None):
         if feature_names is None:

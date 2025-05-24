@@ -28,7 +28,7 @@ def root():
 
 
 @app.get("/predict")
-def predict(
+async def predict(
     ahead: int = 24,
     model_name: str = Query(default="LSTM")
 ):
@@ -40,7 +40,7 @@ def predict(
         raise HTTPException(status_code=400, detail=f"Unsupported model: {model_name}")
 
     try:
-        processor = OpenAQProcessor(API_KEY="API_KEY")
+        processor = OpenAQProcessor(API_KEY="94d98cbdd0c42919e1017aa7c619b0ec47fa75c988e232eafb8e8f8e01c3584e")
         df_raw = processor.get_data_for_prediction()
         df_processed = processor.preprocess(df_raw)
     except Exception as e:
@@ -80,7 +80,7 @@ def predict(
     last_input_time = df_processed.index[-OFFSET]
     start_time = last_input_time + pd.Timedelta(hours=OFFSET + 1)
 
-    prediction_df["timestamp"] = pd.date_range(start=start_time, periods=ahead, freq="1h")
+    prediction_df["datetimeFrom_local"] = pd.date_range(start=start_time, periods=ahead, freq="1h")
 
     return {
         "model": model_name,
