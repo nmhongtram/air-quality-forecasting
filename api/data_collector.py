@@ -4,6 +4,9 @@ from datetime import datetime, timedelta, timezone
 from openaq import OpenAQ
 from functools import reduce
 import holidays
+from model.config import Configuration
+
+c = Configuration()
 
 class OpenAQProcessor:
     def __init__(self, API_KEY):
@@ -26,30 +29,32 @@ class OpenAQProcessor:
             sensor_id = sensor['id']
             sensor_name = sensor_name_map[sensor_id]
 
-            # Thời gian hiện tại (UTC)
-            datetime_last = datetime.now(timezone.utc)
 
-            # Thời gian hiện tại trừ đi 150 giờ
-            datetime_first = datetime_last - timedelta(hours=150)
+            # Tính toán số giờ cần lấy
+            required_hours = c.DATA_INPUT_SIZE + c.DATA_OFFSET
+            buffer = 24  # Lấy dư 24h để dự phòng thiếu dữ liệu
+
+            datetime_last = datetime.now(timezone.utc)
+            datetime_first = datetime_last - timedelta(hours=required_hours + buffer)
 
             # Định dạng lại chuỗi thời gian nếu cần thiết để phù hợp với API OpenAQ
             # Ví dụ: '2023-10-27T10:00:00Z'
             datetime_first_str = datetime_first.strftime("%Y-%m-%dT%H:%M:%SZ")
             datetime_last_str = datetime_last.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            print(f"datetime_first: {datetime_first_str}")
-            print(f"datetime_last: {datetime_last_str}")
+            # print(f"datetime_first: {datetime_first_str}")
+            # print(f"datetime_last: {datetime_last_str}")
 
             all_measurements = []
             page = 1
-            limit = 1000        # Cần 96h để dự đoán 48h kế tiếp
+            limit = 1000       
 
             try:
                 response = self.api.measurements.list(
                     sensors_id=sensor_id,
                     data='hours',
                     datetime_from=datetime_first,
-                    datetime_to=datetime_last,
+                    datetime_to=None,  # None để lấy đến thời điểm hiện tại
                     page=page,
                     limit=limit
                 )
@@ -77,7 +82,7 @@ class OpenAQProcessor:
         return df_merged
 
 
-    def preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
+    def preprocess(self, df: pd.DataFrame, historical=False) -> pd.DataFrame:
         # Đổi tên cột: loại bỏ đơn vị
         df.rename(columns={
             "co µg/m³": "co",
@@ -93,11 +98,16 @@ class OpenAQProcessor:
         full_index = pd.date_range(start=df.index.min(), end=df.index.max(), freq='1h')
         df = df.reindex(full_index)
 
+        if historical:
+            # Khôi phục lại cột thời gian để sử dụng ở downstream
+            df = df.reset_index().rename(columns={'index': 'datetimeFrom_local'})
+            return df.replace(np.nan, None)
+
         # Xử lý missing values dùng forward fill
         df.fillna(method='ffill', inplace=True)
 
         # Các cột cần transform
-        cols_to_transform = ["co", "pm25", "no2"]
+        cols_to_transform = ["pm25","co", "no2"]
 
         # Apply log transform ONLY to the specified columns
         transformed_df = df.copy()

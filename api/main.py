@@ -1,11 +1,12 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, WebSocket
 import torch
 import numpy as np
 import pandas as pd
-from .data_collector import OpenAQProcessor
+from data_collector import OpenAQProcessor
 from model.models import LSTM, GRU, RNN
 from model.config import Configuration
 import os
+import json
 
 app = FastAPI()
 
@@ -25,6 +26,17 @@ MODEL_CLASSES = {
 @app.get("/")
 def root():
     return {"message": "Air quality prediction API is running."}
+
+
+@app.get("/historical")
+async def get_historical_data():
+    try:
+        processor = OpenAQProcessor(API_KEY="94d98cbdd0c42919e1017aa7c619b0ec47fa75c988e232eafb8e8f8e01c3584e")
+        df_raw = processor.get_data_for_prediction()
+        df_processed = processor.preprocess(df_raw, historical=True)
+        return df_processed.to_dict(orient="records")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Can't get historical data: {str(e)}")
 
 
 @app.get("/predict")
@@ -49,7 +61,7 @@ async def predict(
     if len(df_processed) < INPUT_SIZE + OFFSET:
         raise HTTPException(status_code=400, detail="Not enough data to make prediction.")
 
-    input_data = df_processed.iloc[-(INPUT_SIZE + OFFSET)+1:-OFFSET+1].values
+    input_data = df_processed.iloc[-(INPUT_SIZE + OFFSET):-OFFSET].values
     input_tensor = torch.tensor(input_data, dtype=torch.float32).unsqueeze(0)
 
     model_class = MODEL_CLASSES[model_name]
@@ -77,8 +89,8 @@ async def predict(
 
     prediction_df = pd.DataFrame(np.expm1(prediction), columns=["pm25", "co", "no2"])
 
-    last_input_time = df_processed.index[-OFFSET]
-    start_time = last_input_time + pd.Timedelta(hours=OFFSET + 1)
+    last_input_time = df_processed.index[-(OFFSET+1)]
+    start_time = last_input_time + pd.Timedelta(hours=OFFSET+1)
 
     prediction_df["datetimeFrom_local"] = pd.date_range(start=start_time, periods=ahead, freq="1h")
 
@@ -87,5 +99,8 @@ async def predict(
         "ahead": ahead,
         "prediction": prediction_df.to_dict(orient="records")
     }
+
+
+
 
 # uvicorn api.main:app --reload

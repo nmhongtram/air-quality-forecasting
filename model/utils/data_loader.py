@@ -74,7 +74,7 @@ class TimeSeriesDataLoader:
             raise ValueError("Invalid features_type. Choose from 'S', 'M', 'MS'.")
 
         # Các cột cần transform
-        self.cols_to_transform = ["co", "pm25", "no2"]
+        self.cols_to_transform = ["pm25", "co", "no2"]
 
          # Apply log transform ONLY to the specified columns
         # Note: No scaling is applied in this version

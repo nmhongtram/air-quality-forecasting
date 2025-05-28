@@ -67,8 +67,8 @@ class ModelManager:
         plt.title('Train vs Validation Loss')
         plt.legend()
         plt.grid(True)
-        # plot_path = os.path.join(save_dir, f'{self.model.__class__.__name__}_loss_plot.png')
-        # plt.savefig(plot_path)
+        plot_path = os.path.join(save_dir, f'{self.model.__class__.__name__}_loss_plot.png')
+        plt.savefig(plot_path)
         plt.show()
         plt.close()
 

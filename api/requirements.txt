@@ -1,9 +1,6 @@
 numpy
 pandas
 torch
-torchinfo
-matplotlib
-seaborn
 holidays
 openaq==0.4.0
 fastapi

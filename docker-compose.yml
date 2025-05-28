@@ -1,0 +1,30 @@
+services:
+  fastapi_app:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    networks:
+      - aqi_network
+
+  streamlit_app:
+    build:
+      context: .
+      dockerfile: ./streamlit_app/Dockerfile
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - fastapi_app
+    environment:
+      - API_URL=http://fastapi_app:8000
+    networks:
+      - aqi_network
+
+networks:
+  aqi_network:
+    driver: bridge
