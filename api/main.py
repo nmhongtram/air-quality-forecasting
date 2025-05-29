@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query, HTTPException, WebSocket
 import torch
 import numpy as np
 import pandas as pd
-from data_collector import OpenAQProcessor
+from api.data_collector import OpenAQProcessor
 from model.models import LSTM, GRU, RNN
 from model.config import Configuration
 import os
@@ -27,6 +27,9 @@ MODEL_CLASSES = {
 def root():
     return {"message": "Air quality prediction API is running."}
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.get("/historical")
 async def get_historical_data():
