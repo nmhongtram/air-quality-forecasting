@@ -1,7 +1,7 @@
-from models import RNN, LSTM, GRU
-from utils.data_loader import TimeSeriesDataLoader
-from utils.model_manager import ModelManager
-from config import Configuration
+from model.models import RNN, LSTM, GRU
+from model.utils.data_loader import TimeSeriesDataLoader
+from model.utils.model_manager import ModelManager
+from model.config import Configuration
 
 
 # Load cấu hình
