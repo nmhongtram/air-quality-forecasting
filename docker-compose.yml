@@ -1,30 +1,35 @@
+version: "3.8"
+
 services:
   fastapi_app:
-    build:
-      context: .
-      dockerfile: ./api/Dockerfile
-    container_name: fastapi_app
+    image: tramnguyenm/fastapi_app:latest
     ports:
       - "8000:8000"
+    networks:
+      - aqi_network
     environment:
       - PYTHONPATH=/app
-    networks:
-      - aqi_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   streamlit_app:
-    build:
-      context: .
-      dockerfile: ./streamlit_app/Dockerfile
-    container_name: streamlit_app
+    image: tramnguyenm/streamlit_app:latest
     ports:
       - "8501:8501"
-    depends_on:
-      - fastapi_app
-    environment:
-      - API_URL=http://fastapi_app:8000
     networks:
       - aqi_network
+    environment:
+      - API_URL=http://fastapi_app:8000
+      - STREAMLIT_SERVER_ENABLE_WATCHER=false
+      - STREAMLIT_SERVER_ENABLE_XSRF=false
+      - STREAMLIT_SERVER_ENABLE_CORS=false
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
 networks:
   aqi_network:
-    driver: bridge
+    driver: overlay
