@@ -13,7 +13,6 @@ class OpenAQProcessor:
         self.api = OpenAQ(API_KEY)
 
     def get_data_for_prediction(self, location_id=2161290):
-        # Vì offset là 24h nên khung thời gian có thể dự đoán sẽ từ thời điểm hiện tại đến 48 giờ sau.
         sensors = self.api.locations.sensors(locations_id = 2161290)
         sensors_dict = sensors.dict()
 
