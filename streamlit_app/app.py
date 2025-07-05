@@ -88,7 +88,7 @@ def compute_pm25_aqi(pm25):
     for Clow, Chigh, Ilow, Ihigh in PM25_BREAKPOINTS:
         if Clow <= pm25 <= Chigh:
             return round(((Ihigh - Ilow) / (Chigh - Clow)) * (pm25 - Clow) + Ilow)
-    return None  # Nếu ngoài giới hạn
+    return None  
 
 def calculate_aqi(row):
     if pd.notna(row['pm25']):
