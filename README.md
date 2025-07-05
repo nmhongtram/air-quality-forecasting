@@ -10,9 +10,8 @@
 4. [Data Source](#data-source)
 5. [Deep Learning Models](#deep-learning-models)
 6. [Evaluation Metrics](#evaluation-metrics)
-7. [Project Structure](#project-structure)
-8. [Setup and Deployment](#setup-and-deployment)
-9. [Results and Discussion](#results-and-discussion)
+7. [Setup and Deployment](#setup-and-deployment)
+8. [Results and Discussion](#results-and-discussion)
 
 ## Overview <a name="overview"></a>
 
